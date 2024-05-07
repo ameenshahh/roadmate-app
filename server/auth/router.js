@@ -1,10 +1,12 @@
 const router = require("express").Router();
 
+// validators
+const signupValidator = require("./validators/signupValidator");
+const loginValidator = require("./validators/loginValidator");
+
 // Users
-router.post("/signup", require("./signup"));
-router.post("/login", require("./login"));
-
-
+router.post("/signup", signupValidator, require("./signup"));
+router.post("/login", loginValidator, require("./login"));
 
 //  Router Export
 module.exports = router;

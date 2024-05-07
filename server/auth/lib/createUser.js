@@ -1,15 +1,8 @@
 const User = require("../../models").User;
 
-module.exports = async (user) => {
-  // Defining Params
-  const params = {
-    name: user.name,
-    email: user.email,
-    password: user.password,
-  };
-
+module.exports = async ({ name,email, password }) => {
   try {
-    const response = await User.create(params);
+    const response = await User.create({ name,email, password });
     return response;
   } catch (e) {
     throw e;

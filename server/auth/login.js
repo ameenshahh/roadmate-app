@@ -1,7 +1,7 @@
 const { Op } = require("sequelize");
-const {User} = require("../models");
+const { User } = require("../models");
 const jwtUtil = require("../auth/lib/jwt");
-const passUtil = require("./lib/password");
+const { hash } = require("./lib/password");
 const getUserById = require("./lib/getUserById");
 const Responder = require("../shared/responder");
 
@@ -11,11 +11,10 @@ module.exports = async (req, res) => {
   // Password ReHashing
   let password;
   try {
-    password = passUtil.hash(req.body.password);
+    password = hash(req.body.password);
   } catch (e) {
     return responder.crash();
   }
-
 
   try {
     const user = await User.findOne({ where: { email: req.body.email } });

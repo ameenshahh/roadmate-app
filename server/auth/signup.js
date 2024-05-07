@@ -18,9 +18,9 @@ module.exports = async (req, res) => {
       });
     }
 
-    password = hash(password)
+    password = hash(password);
 
-    let createdUser = await createUser({ email, password });
+    let createdUser = await createUser({ name,email, password });
 
     if (createdUser) {
       responder.success({
