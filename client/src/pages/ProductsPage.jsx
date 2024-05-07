@@ -17,7 +17,7 @@ const ProductsPage = () => {
                 <input
                   class="form-control mr-sm-2"
                   type="search"
-                  placeholder="Search Student"
+                  placeholder="Search products"
                   aria-label="Search"
                 />
               </form>

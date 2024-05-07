@@ -22,7 +22,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", require("./auth/router"));
-app.use("/franchise", require("./franchise/router"));
 
 
 app.listen(process.env.PORT, () => {
