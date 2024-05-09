@@ -22,6 +22,7 @@ app.get("/", (req, res) => {
 });
 
 app.use("/auth", require("./auth/router"));
+app.use("/product", require("./products/router"));
 
 
 app.listen(process.env.PORT, () => {

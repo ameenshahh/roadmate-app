@@ -19,7 +19,6 @@ const SignUpPage = () => {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-
   // Function to handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -49,7 +48,6 @@ const SignUpPage = () => {
       // localStorage.setItem("token", token);
       try {
         const response = await axiosInstance.post("/auth/signup", formData);
-        console.log(`response-----${JSON.stringify(response)}`);
         const token = response.data.token;
         if (response.status == 200) {
           setSuccess(true);
@@ -118,6 +116,20 @@ const SignUpPage = () => {
           ></button>
         </div>
       )}
+      {error && (
+        <div
+          className="alert alert-danger alert-dismissible fade show"
+          role="alert"
+        >
+          <span>{error}</span>
+          <button
+            type="button"
+            className="btn-close"
+            data-bs-dismiss="alert"
+            aria-label="Close"
+          ></button>
+        </div>
+      )}
       <form className="Auth-form" onSubmit={handleSubmit}>
         <div className="Auth-form-content">
           <h3 className="Auth-form-title">Sign Up</h3>
@@ -173,7 +185,6 @@ const SignUpPage = () => {
           </div>
         </div>
       </form>
-      {error && <p style={{ color: "red" }}>{error}</p>}
     </div>
   );
 };

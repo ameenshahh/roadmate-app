@@ -122,6 +122,7 @@ const LoginPage = () => {
           </div>
         </div>
       </form>
+      
     </div>
   );
 };

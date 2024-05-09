@@ -1,4 +1,3 @@
-const { Op } = require("sequelize");
 const { User } = require("../models");
 const jwtUtil = require("../auth/lib/jwt");
 const { hash } = require("./lib/password");
