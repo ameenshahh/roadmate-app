@@ -8,14 +8,15 @@ const ProductsPage = () => {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
+  const [productsCount, setProductsCount] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const [search, setSearch] = useState("");
 
   const [show, setShow] = useState(false);
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [params, setParams] = useState({ product: "", page: 1, size: 10 });
 
   const [formData, setFormData] = useState({
     product_name: "",
@@ -38,8 +39,11 @@ const ProductsPage = () => {
 
   const getAllProducts = async () => {
     try {
-      const response = await axiosInstance.get("/product/all");
-      setProducts(response.data.data);
+      const response = await axiosInstance.get(
+        `/product/search?product=${params.product}&page=${params.page}&size=${params.size}`
+      );
+      setProducts(response.data.data.products);
+      setProductsCount(response.data.data.count);
     } catch (error) {
       if (error.response) {
         setError(error.response.data.message);
@@ -59,6 +63,14 @@ const ProductsPage = () => {
     isLoggedIn();
     getAllProducts();
   }, []);
+
+  useEffect(() => {
+    let timeOut = setTimeout(() => {
+      getAllProducts();
+    }, 1000);
+
+    return () => clearTimeout(timeOut);
+  }, [params]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -90,7 +102,7 @@ const ProductsPage = () => {
             category: "",
           });
           setShow(false);
-          setProducts([...products, response.data.data]);
+          getAllProducts();
         }
       } catch (error) {
         if (error.response) {
@@ -108,6 +120,7 @@ const ProductsPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
+    console.log(value);
     setFormData({
       ...formData,
       [name]: value,
@@ -118,8 +131,15 @@ const ProductsPage = () => {
       [name]: "",
     });
   };
+
+  const handleSearchProduct = async (e) => {
+    const { name, value } = e.target;
+    setParams({ ...params, product: value });
+  };
+
   return (
     <div className="container">
+      {/* {JSON.stringify(params)} */}
       {error && (
         <div
           className="alert alert-danger alert-dismissible fade show mt-2"
@@ -152,14 +172,15 @@ const ProductsPage = () => {
         <div className="row ">
           <div className="col-sm-3 mt-5 mb-4 text-gred">
             <div className="search">
-              <form className="form-inline">
-                <input
-                  className="form-control mr-sm-2"
-                  type="search"
-                  placeholder="Search products"
-                  aria-label="Search"
-                />
-              </form>
+              <input
+                className="form-control mr-sm-2"
+                type="search"
+                name="search"
+                placeholder="Search products"
+                aria-label="Search"
+                onChange={handleSearchProduct}
+                value={params.product}
+              />
             </div>
           </div>
           <div
@@ -220,6 +241,34 @@ const ProductsPage = () => {
                 })}
               </tbody>
             </table>
+
+            {/* Pagination */}
+            <nav>
+              <ul class="pagination">
+                <li class="page-item">
+                  <a class="page-link" href="#" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                  </a>
+                </li>
+                {productsCount &&
+                  Array.from(
+                    { length: Math.ceil(productsCount / params.size) },
+                    (_, index) => (
+                      <li class="page-item" key={index}>
+                        <a class="page-link" href="#">
+                          {index + 1}
+                        </a>
+                      </li>
+                    )
+                  )}
+
+                <li class="page-item">
+                  <a class="page-link" href="#" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
 

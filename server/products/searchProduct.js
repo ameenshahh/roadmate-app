@@ -7,8 +7,8 @@ module.exports = async (req, res) => {
   let { product, page, size } = req.query;
 
   product = product || "";
-  page = page || 1;
-  size = size || 10;
+  page = parseInt(page) || 1;
+  size = parseInt(size) || 10;
 
   const offset = (page - 1) * size;
 
@@ -17,7 +17,7 @@ module.exports = async (req, res) => {
     const searchedProduct = await searchProduct({
       product,
       size,
-      offset
+      offset,
     });
 
     if (searchedProduct) {
