@@ -1,21 +1,34 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Modal, Input } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const ProductsPage = () => {
+  const navigate = useNavigate();
+
   const [show, setShow] = useState(false);
 
   const handleClose = () => setShow(false);
   const handleShow = () => setShow(true);
+
+  const isLoggedIn = ()=>{
+    let token = localStorage.getItem('token')
+    if(!token){
+      navigate('/login');
+    }
+  }
+  useEffect(() => {
+    isLoggedIn();
+  }, []);
   return (
-    <div class="container ">
+    <div className="container ">
       <div className="crud shadow-lg p-3 mb-5 mt-5 bg-body rounded">
-        <div class="row ">
-          <div class="col-sm-3 mt-5 mb-4 text-gred">
+        <div className="row ">
+          <div className="col-sm-3 mt-5 mb-4 text-gred">
             <div className="search">
-              <form class="form-inline">
+              <form className="form-inline">
                 <input
-                  class="form-control mr-sm-2"
+                  className="form-control mr-sm-2"
                   type="search"
                   placeholder="Search products"
                   aria-label="Search"
@@ -24,22 +37,22 @@ const ProductsPage = () => {
             </div>
           </div>
           <div
-            class="col-sm-3 offset-sm-2 mt-5 mb-4 text-gred"
+            className="col-sm-3 offset-sm-2 mt-5 mb-4 text-gred"
             style={{ color: "green" }}
           >
             <h2>
               <b>Products</b>
             </h2>
           </div>
-          <div class="col-sm-3 offset-sm-1  mt-5 mb-4 text-gred">
+          <div className="col-sm-3 offset-sm-1  mt-5 mb-4 text-gred">
             <Button variant="primary" onClick={handleShow}>
               Add New Product
             </Button>
           </div>
         </div>
-        <div class="row">
-          <div class="table-responsive ">
-            <table class="table table-striped table-hover table-bordered">
+        <div className="row">
+          <div className="table-responsive ">
+            <table className="table table-striped table-hover table-bordered">
               <thead>
                 <tr>
                   <th>#</th>
