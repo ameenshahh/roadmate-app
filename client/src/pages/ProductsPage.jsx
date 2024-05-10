@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Button, Modal, Input } from "react-bootstrap";
+import { Button, Modal, Input, Pagination } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axios";
 
@@ -29,6 +29,8 @@ const ProductsPage = () => {
     no_of_stocks: "",
     category: "",
   });
+
+  let totalPages = Math.ceil(productsCount / params.size);
 
   const isLoggedIn = () => {
     let token = localStorage.getItem("token");
@@ -134,12 +136,41 @@ const ProductsPage = () => {
 
   const handleSearchProduct = async (e) => {
     const { name, value } = e.target;
-    setParams({ ...params, product: value });
+    setParams((prevParams) => ({
+      ...prevParams,
+      product: value,
+      page: 1,
+    }));
+  };
+
+  const paginationBtnHandler = (e) => {
+    let buttonValue = e.target.value;
+    setParams((prevParams) => ({
+      ...prevParams,
+      page: buttonValue,
+    }));
+  };
+
+  const handlePrevPaginationBtn = () => {
+    if (params.page > 1) {
+      setParams((prevParams) => ({
+        ...prevParams,
+        page: parseInt(prevParams.page) - 1,
+      }));
+    }
+  };
+
+  const handleNextPaginationBtn = () => {
+    if (params.page < totalPages) {
+      setParams((prevParams) => ({
+        ...prevParams,
+        page: parseInt(prevParams.page) + 1,
+      }));
+    }
   };
 
   return (
     <div className="container">
-      {/* {JSON.stringify(params)} */}
       {error && (
         <div
           className="alert alert-danger alert-dismissible fade show mt-2"
@@ -197,80 +228,99 @@ const ProductsPage = () => {
             </Button>
           </div>
         </div>
-        <div className="row">
-          <div className="table-responsive ">
-            <table className="table table-striped table-hover table-bordered">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Product name </th>
-                  <th>Stocks</th>
-                  <th>Category </th>
-                  <th>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map((item, index) => {
-                  return (
-                    <tr key={index}>
-                      <td>{index + 1}</td>
-                      <td>{item.product_name}</td>
-                      <td>{item.no_of_stocks}</td>
-                      <td>{item.category}</td>
+        {productsCount > 0 ? (
+          <div className="row">
+            <div className="table-responsive ">
+              <table className="table table-striped table-hover table-bordered">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Product name </th>
+                    <th>Stocks</th>
+                    <th>Category </th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((item, index) => {
+                    return (
+                      <tr key={index}>
+                        <td>{(params.page - 1) * params.size + index + 1}</td>
+                        <td>{item.product_name}</td>
+                        <td>{item.no_of_stocks}</td>
+                        <td>{item.category}</td>
 
-                      <td>
-                        <a
-                          className="edit"
-                          title="Edit"
-                          data-toggle="tooltip"
-                          onClick={() => handleEdit(item)}
-                        >
-                          <i className="material-icons">&#xE254;</i>
-                        </a>
-                        <a
-                          className="delete"
-                          title="Delete"
-                          data-toggle="tooltip"
-                          style={{ color: "red" }}
-                        >
-                          <i className="material-icons">&#xE872;</i>
-                        </a>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        <td>
+                          <a
+                            className="edit"
+                            title="Edit"
+                            data-toggle="tooltip"
+                            onClick={() => handleEdit(item)}
+                          >
+                            <i className="material-icons">&#xE254;</i>
+                          </a>
+                          <a
+                            className="delete"
+                            title="Delete"
+                            data-toggle="tooltip"
+                            style={{ color: "red" }}
+                          >
+                            <i className="material-icons">&#xE872;</i>
+                          </a>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
 
-            {/* Pagination */}
-            <nav>
-              <ul class="pagination">
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Previous">
-                    <span aria-hidden="true">&laquo;</span>
-                  </a>
-                </li>
-                {productsCount &&
-                  Array.from(
-                    { length: Math.ceil(productsCount / params.size) },
-                    (_, index) => (
-                      <li class="page-item" key={index}>
-                        <a class="page-link" href="#">
+              {/* Pagination */}
+
+              <nav>
+                <ul className="pagination">
+                  <li className="page-item">
+                    <button
+                      className="page-link"
+                      aria-label="Previous"
+                      onClick={handlePrevPaginationBtn}
+                    >
+                      <span aria-hidden="true">&laquo;</span>
+                    </button>
+                  </li>
+                  {productsCount &&
+                    Array.from({ length: totalPages }, (_, index) => (
+                      <li
+                        className={`page-item ${
+                          params.page == index + 1 ? "active" : ""
+                        }`}
+                        key={index}
+                      >
+                        <button
+                          className="page-link"
+                          value={index + 1}
+                          onClick={paginationBtnHandler}
+                        >
                           {index + 1}
-                        </a>
+                        </button>
                       </li>
-                    )
-                  )}
+                    ))}
 
-                <li class="page-item">
-                  <a class="page-link" href="#" aria-label="Next">
-                    <span aria-hidden="true">&raquo;</span>
-                  </a>
-                </li>
-              </ul>
-            </nav>
+                  <li className="page-item">
+                    <button
+                      className="page-link"
+                      aria-label="Next"
+                      onClick={handleNextPaginationBtn}
+                    >
+                      <span aria-hidden="true">&raquo;</span>
+                    </button>
+                  </li>
+                </ul>
+              </nav>
+            </div>
           </div>
-        </div>
+        ) : (
+          <h5 class="text-center">No result found</h5>
+        )}
 
         {/* <!--- Add productModal Box ---> */}
         <div className="model_box">
@@ -358,6 +408,92 @@ const ProductsPage = () => {
 
           {/* Model Box  */}
         </div>
+
+        {/* Edit product Modal */}
+        {/* <div className="model_box">
+          <Modal
+            show={show}
+            onHide={handleClose}
+            backdrop="static"
+            keyboard={false}
+          >
+            <Modal.Header closeButton>
+              <Modal.Title>Add Product</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+              {error && (
+                <div
+                  className="alert alert-danger alert-dismissible fade show"
+                  role="alert"
+                >
+                  <span>{error}</span>
+                  <button
+                    type="button"
+                    className="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close"
+                  ></button>
+                </div>
+              )}
+              <form onSubmit={handleSubmit}>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="productName"
+                    name="product_name"
+                    placeholder="Enter product name"
+                    value={formData.product_name}
+                    onChange={handleChange}
+                  />
+                  {formErrors.product_name && (
+                    <p className="text-danger">{formErrors.product_name}</p>
+                  )}
+                </div>
+
+                <div className="form-group mt-3">
+                  <input
+                    type="number"
+                    className="form-control"
+                    id="stocks"
+                    name="no_of_stocks"
+                    placeholder="Enter no of stocks"
+                    value={formData.no_of_stocks}
+                    onChange={handleChange}
+                  />
+                  {formErrors.no_of_stocks && (
+                    <p className="text-danger">{formErrors.no_of_stocks}</p>
+                  )}
+                </div>
+                <div className="form-group mt-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="category"
+                    name="category"
+                    placeholder="Enter category"
+                    value={formData.category}
+                    onChange={handleChange}
+                  />
+                  {formErrors.category && (
+                    <p className="text-danger">{formErrors.category}</p>
+                  )}
+                </div>
+
+                <button type="submit" className="btn btn-success mt-4">
+                  Save
+                </button>
+              </form>
+            </Modal.Body>
+
+            <Modal.Footer>
+              <Button variant="secondary" onClick={handleClose}>
+                Close
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div> */}
+        {/* Edit Product Modal */}
       </div>
     </div>
   );
