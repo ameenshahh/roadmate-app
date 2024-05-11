@@ -1,9 +1,14 @@
 const Product = require("../../models").Product;
 
-module.exports = async (product) => {
+module.exports = async (id) => {
   try {
-    const response = await Product.create(product);
-    return response;
+    const product = await Product.findByPk(id);
+
+    if (!product) {
+      throw new Error("This product doesn't exist");
+    }
+
+    return await product.destroy();
   } catch (e) {
     throw e;
   }

@@ -19,12 +19,12 @@ router.patch(
   require("./editProduct")
 );
 
-// router.delete(
-//   "/delete/:id",
-//   authenticate,
-//   deleteProductValidator,
-//   require("./deleteProduct")
-// );
+router.delete(
+  "/delete/:id",
+  authenticate,
+  deleteProductValidator,
+  require("./deleteProduct")
+);
 
 //  Router Export
 module.exports = router;
