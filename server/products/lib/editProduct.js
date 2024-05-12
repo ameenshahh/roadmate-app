@@ -16,7 +16,6 @@ module.exports = async (params) => {
 
     return await product.save();
   } catch (e) {
-    console.log(e);
     throw e;
   }
 };

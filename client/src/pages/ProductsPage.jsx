@@ -1,22 +1,36 @@
 import React, { useEffect, useState } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Modal, Input, Pagination } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../axios";
+
+import EditProductModal from "../components/EditProductModal";
 
 const ProductsPage = () => {
   const navigate = useNavigate();
 
   const [products, setProducts] = useState([]);
   const [productsCount, setProductsCount] = useState(0);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState({
+    product_name: "",
+    no_of_stocks: "",
+    category: "",
+  });
 
   const [show, setShow] = useState(false);
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  const [toggleEditProductModal, setToggleEditProductModal] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [params, setParams] = useState({ product: "", page: 1, size: 10 });
+
+  const editProductModalProps = {
+    toggleEditProductModal,
+    setToggleEditProductModal,
+    selectedProduct,
+    setSelectedProduct,
+    params,
+    setProducts,
+    setProductsCount,
+  };
 
   const [formData, setFormData] = useState({
     product_name: "",
@@ -31,6 +45,12 @@ const ProductsPage = () => {
   });
 
   let totalPages = Math.ceil(productsCount / params.size);
+
+  const toggleProductModalHandler = () => {
+    setToggleEditProductModal(!toggleEditProductModal);
+  };
+  const handleClose = () => setShow(false);
+  const handleShow = () => setShow(true);
 
   const isLoggedIn = () => {
     let token = localStorage.getItem("token");
@@ -122,7 +142,6 @@ const ProductsPage = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(value);
     setFormData({
       ...formData,
       [name]: value,
@@ -169,6 +188,33 @@ const ProductsPage = () => {
     }
   };
 
+  const handleEditProduct = (data) => {
+    setSelectedProduct(data);
+  };
+
+  const handleDeleteProduct = async (id) => {
+    try {
+      const response = await axiosInstance.delete(`/product/delete/${id}`);
+      if (response.status == 200) {
+        setSuccess("Product deleted successfully");
+        getAllProducts();
+      }
+    } catch (error) {
+      if (error.response) {
+        setError(error.response.data.message);
+      } else if (error.request) {
+        setError("No response received from the server");
+      } else {
+        setError("An unexpected error occurred");
+      }
+    }
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
+
   return (
     <div className="container">
       {error && (
@@ -190,7 +236,7 @@ const ProductsPage = () => {
           className="alert alert-success alert-dismissible fade show mt-2"
           role="alert"
         >
-          <strong>Product added successfully</strong>
+          <strong>{success}</strong>
           <button
             type="button"
             className="btn-close"
@@ -199,8 +245,13 @@ const ProductsPage = () => {
           ></button>
         </div>
       )}
+
       <div className="crud shadow-lg p-3 mb-5 mt-5 bg-body rounded">
-        <div className="row ">
+        <button className="btn btn-danger float-end" onClick={handleLogout}>
+          Logout
+        </button>
+
+        <div className="row">
           <div className="col-sm-3 mt-5 mb-4 text-gred">
             <div className="search">
               <input
@@ -255,7 +306,13 @@ const ProductsPage = () => {
                             className="edit"
                             title="Edit"
                             data-toggle="tooltip"
-                            onClick={() => handleEdit(item)}
+                            onClick={() => {
+                              setToggleEditProductModal(true);
+                              handleEditProduct(item);
+                            }}
+                            style={{
+                              cursor: "pointer",
+                            }}
                           >
                             <i className="material-icons">&#xE254;</i>
                           </a>
@@ -263,7 +320,10 @@ const ProductsPage = () => {
                             className="delete"
                             title="Delete"
                             data-toggle="tooltip"
-                            style={{ color: "red" }}
+                            style={{ color: "red", cursor: "pointer" }}
+                            onClick={() => {
+                              handleDeleteProduct(item.id);
+                            }}
                           >
                             <i className="material-icons">&#xE872;</i>
                           </a>
@@ -319,7 +379,7 @@ const ProductsPage = () => {
             </div>
           </div>
         ) : (
-          <h5 class="text-center">No result found</h5>
+          <h5 className="text-center">No result found</h5>
         )}
 
         {/* <!--- Add productModal Box ---> */}
@@ -409,7 +469,7 @@ const ProductsPage = () => {
           {/* Model Box  */}
         </div>
 
-       
+        <EditProductModal {...editProductModalProps} />
       </div>
     </div>
   );

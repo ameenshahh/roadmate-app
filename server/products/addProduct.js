@@ -10,7 +10,6 @@ module.exports = async (req, res) => {
     // Checking for existing user
     const addedProduct = await addProduct({ product_name, no_of_stocks, category });
 
-    console.log(addedProduct)
     if (addedProduct) {
       responder.success({
         message: "Product added successfully",

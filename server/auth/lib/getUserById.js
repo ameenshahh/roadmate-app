@@ -8,7 +8,6 @@ module.exports = async (id) => {
     user = await User.findOne({ where: filter });
     return user;
   } catch (e) {
-    console.log(e);
     throw e;
   }
 };

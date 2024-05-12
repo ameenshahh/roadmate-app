@@ -3,6 +3,8 @@ import "./App.css";
 import LoginPage from "./pages/LoginPage";
 import ProductsPage from "./pages/ProductsPage";
 import SignUpPage from "./pages/SignUpPage";
+import "bootstrap/dist/css/bootstrap.min.css";
+
 
 function App() {
   return (

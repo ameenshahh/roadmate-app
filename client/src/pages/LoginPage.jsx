@@ -1,10 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import "../styles/login.css";
 import axiosInstance from "../axios";
 import { useNavigate } from "react-router-dom";
 
 const LoginPage = () => {
-
   const navigate = useNavigate();
 
   // State to manage form fields
@@ -20,6 +19,17 @@ const LoginPage = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    isLoggedIn();
+  }, []);
+
+  const isLoggedIn = () => {
+    let token = localStorage.getItem("token");
+    if (token) {
+      navigate("/");
+    }
+  };
 
   // Function to handle form submission
   const handleSubmit = async (e) => {
@@ -49,8 +59,8 @@ const LoginPage = () => {
             password: "",
           });
           const token = response.data.data.access_token;
-          localStorage.setItem('token', token);
-          navigate('/')
+          localStorage.setItem("token", token);
+          navigate("/");
         }
       } catch (error) {
         if (error.response) {
@@ -122,7 +132,6 @@ const LoginPage = () => {
           </div>
         </div>
       </form>
-      
     </div>
   );
 };
